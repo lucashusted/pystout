@@ -29,16 +29,15 @@ model3 = sm.OLS(y,X).fit()
 
 pystout(models=[model1,model2,model3],
         file='testing/test_table.tex',
-        addnotes=['Here is a little note'],
+        addnotes=['Here is a little note','another note'],
         digits=2,
         endog_names=['Custom','Header','Please'],
         varlabels={'const':'Constant','displacement':'Disp','mpg':'MPG'}
         )
 ```
 
-Pystout takes the following inputs:
+Pystout has the following options:
 
-Inputs:
     models:         You need to provide a list of models to print.
                     Currenty must be fitted from statsmodels.OLS().fit()
                     
