@@ -8,7 +8,7 @@ Current Issues:
 
 The normal use would be as follows:
 
-'''
+```
 import statsmodels.api as sm
 import pystout
 from pystout import pystout
@@ -34,7 +34,7 @@ pystout(models=[model1,model2,model3],
         endog_names=['Custom','Header','Please'],
         varlabels={'const':'Constant','displacement':'Disp','mpg':'MPG'}
         )
-'''
+```
 
 Pystout takes the following inputs:
 
