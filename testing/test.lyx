@@ -91,7 +91,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Bullshit
+The Table From Python
 \end_layout
 
 \end_inset
@@ -108,7 +108,7 @@ status open
 
 
 \backslash
-input{/Users/whiskey/Documents/Columbia/Disaster_Paper/data/temp.tex}
+input{test_table.tex}
 \end_layout
 
 \end_inset
