@@ -1,6 +1,5 @@
 # Testing pystout
 import statsmodels.api as sm
-import pandas as pd
 import pystout
 from pystout import pystout
 
