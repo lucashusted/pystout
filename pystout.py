@@ -123,7 +123,7 @@ Inputs:
                     If ordered list, then only pull these variables from each model, if exist.
 
     endog_names:    False generates numbered columns, True generates columns.
-                    Based on the exog_names in the models, passing a list makes custom column names.
+                    Based on the index in params, passing a list makes custom column names.
 
     varlabels:      Dictionary, or NoneType -- Custom labels for variables in table.
                     Works for exog/endog variables.
@@ -165,19 +165,30 @@ Output:
         except:
             y = x
         return y
-    # puller functions for model parameters
+
+    # puller functions for model parameters and other singletons
     def trygetp(x,thing):
         try:
             y = thing[x]
         except:
             y = np.nan
         return y
-    def trygetcov(x,thing):
-        try:
-            y = thing.loc[x,x]**.5
-        except:
-            y = np.nan
+
+    # this pulls in variables that come in symmetric matrix
+    def trygetcov(x,m):
+        if m.__module__.startswith('statsmodels'):
+            try:
+                y = m.cov_params().loc[x,x]**.5
+            except:
+                y = np.nan
+        elif m.__module__.startswith('linearmodels'):
+            try:
+                y = m.cov.loc[x,x]**.5
+            except:
+                y = np.nan
         return y
+
+    # this pulls in the relevant statistics from the model
     def trygetstat(x,model):
         if x=='nobs':
             try:
@@ -185,10 +196,16 @@ Output:
             except:
                 y = ''
         elif x=='fvalue':
-            try:
-                y = digform.format(model.fvalue)
-            except:
-                y = ''
+            if m.__module__.startswith('statsmodels'):
+                try:
+                    y = digform.format(model.fvalue)
+                except:
+                    y = ''
+            elif m.__module__.startswith('linearmodels'):
+                try:
+                    y = digform.format(model.f_statistic.stat)
+                except:
+                    y = ''
         elif x=='rsquared':
             try:
                 y = digform.format(model.rsquared)
@@ -229,7 +246,7 @@ Output:
     paramlist = []
     if not exogvars:
         for m in models:
-            paramlist += m.model.exog_names.copy()
+            paramlist += m.params.index.to_list()
 
         # Get the unique values and keep them sorted in the old order
         indexes = np.unique(paramlist, return_index=True)[1]
@@ -256,7 +273,7 @@ Output:
         data.append(r)
         r = []
         for m in models:
-            cell = trygetcov(p,m.cov_params())
+            cell = trygetcov(p,m)
             if not np.isnan(cell):
                 r.append('('+digform.format(cell)+')')
             else:
@@ -267,6 +284,7 @@ Output:
     rownames = [tryrelabel(p) for p in paramlist.copy()]
     for ii in range(1,2*len(rownames)+1,2):
         rownames.insert(ii,'')
+    rownames = [x.replace('_','\_') for x in rownames]
 
     df = pd.DataFrame(data,columns=colnames,index=rownames)
 

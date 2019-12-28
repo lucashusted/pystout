@@ -1,27 +1,31 @@
 {
 \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
-\begin{tabular}{@{\extracolsep{2pt}}l*{3}{c}@{}}
+\begin{tabular}{@{\extracolsep{2pt}}l*{5}{c}@{}}
 \hline\hline
-& \multicolumn{1}{c}{Group 1} & \multicolumn{2}{c}{Group 2} \\
-\cline{2-2}
-\cline{3-4}
- & Custom & Header & Please \\
+& \multicolumn{3}{c}{Statsmodels} & \multicolumn{1}{c}{L OLS} & \multicolumn{1}{c}{L TSLS} \\
+\cline{2-4}
+\cline{5-5}
+\cline{6-6}
+ & Custom & Header & Please & Thanks & Again \\
 \hline
-MPG & -121.18 & -180.48\sym{*} &  \\
- & (72.79) & (77.19) &  \\
-Disp & 10.51\sym{*} & 16.39\sym{**} & 20.60\sym{**} \\
- & (4.59) & (5.36) & (5.21) \\
-turn &  & -228.86\sym{*} & -126.50 \\
- &  & (114.20) & (108.75) \\
-Constant & 6672.77\sym{**} & 15849.67\sym{**} & 7115.84\sym{+} \\
- & (2299.72) & (5103.24) & (3584.95) \\
-Test & A & Test & Row \\
+MPG & -121.18 & -180.48\sym{*} &  &  & -265.70 \\
+ & (72.79) & (77.19) &  &  & (234.16) \\
+Disp & 10.51\sym{*} & 16.39\sym{**} & 20.60\sym{**} & 27.77\sym{**} & 14.40 \\
+ & (4.59) & (5.36) & (5.21) & (7.03) & (8.92) \\
+turn &  & -228.86\sym{*} & -126.50 & -110.50 & -277.20 \\
+ &  & (114.20) & (108.75) & (124.51) & (181.73) \\
+gear\_ratio &  &  &  & 1884.45\sym{+} &  \\
+ &  &  &  & (1043.49) &  \\
+Constant & 6672.77\sym{**} & 15849.67\sym{**} & 7115.84\sym{+} & -613.40 & 19973.76 \\
+ & (2299.72) & (5103.24) & (3584.95) & (5907.56) & (12529.40) \\
+Test & A & Test & Row & Here & Too \\
 
 \hline
-Obs & 74 & 74 & 74 \\
-Adj. R\sym{2} & 0.25 & 0.28 & 0.24 \\
+Obs & 74 & 74 & 74 & 74 & 74 \\
+Adj. R\sym{2} & 0.25 & 0.28 & 0.24 & 0.25 & 0.27 \\
+F-stat & 13.35 & 10.62 & 12.41 & 27.71 & 29.81 \\
 \hline\hline
-\multicolumn{4}{l}{\footnotesize Here is a little note} \\
-\multicolumn{4}{l}{\footnotesize And another one} \\
+\multicolumn{6}{l}{\footnotesize Here is a little note} \\
+\multicolumn{6}{l}{\footnotesize And another one} \\
 \end{tabular}
 }
