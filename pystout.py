@@ -104,26 +104,26 @@ Options:
 ################################################################################
 ### The output functon for statsmodels
 ################################################################################
-def pystout(models,file,exogvars=None,endog_names=False,stars={.1:'+',.05:'*',.01:'**'},
-            varlabels=None,digits=2,mgroups={},addnotes=[],
-            modstat={'nobs':'N','fvalue':'F-stat','rsquared_adj':'Adj. R\sym{2}'}):
+def pystout(models, file, exogvars=None, endog_names=False, stars={.1:'+',.05:'*',.01:'**'},
+            varlabels=None, digits=2, mgroups={}, addnotes=[], addrows={},
+            modstat={'nobs':'N','fvalue':'F-stat','rsquared_adj':'Adj. R\sym{2}'}
+            ):
     '''
 This function needs to read in the relevant statistics to populate the table.
 Then it needs to feed them to some version of tex_table
 
 Inputs:
-    models:         You need to provide a list of models to print.
+    models:         A list of models to print.
                     Currenty must be fitted from statsmodels.OLS().fit()
-                    
-    file:           This is the file name (including path) to write to
+
+    file:           This is the file name (including path) to write to.
 
     exogvars:       If none, pull all exogenous variable names.
                     These will be ordered in order of model (the constant will be put last).
                     If ordered list, then only pull these variables from each model, if exist.
 
-    endog_names:    False generates numbered columns, True generates columns
-                    based on the exog_names in the models, passing a list makes
-                    custom column names.
+    endog_names:    False generates numbered columns, True generates columns.
+                    Based on the exog_names in the models, passing a list makes custom column names.
 
     varlabels:      Dictionary, or NoneType -- Custom labels for variables in table.
                     Works for exog/endog variables.
@@ -132,19 +132,23 @@ Inputs:
 
     digits:         Number of digits to round all items to (default=2).
 
-    modstat:        You can add a custom options from sm (F-stat, R-squared, Adjusted R-Squared)
+    modstat:        You can add custom options from sm (F-stat, R-squared, Adjusted R-Squared)
                     Should be a dictionary of {'Name':'statsmodel statistic'}.
                     Currently only accepts: fvalue,rsquared,rsquared_adj,nobs
-    
-    addnotes:       Add notes to the bottom of the table
+
+    addnotes:       Add notes to the bottom of the table.
                     (input is a list; each new element is a new line of comment).
 
+    addrows:        Add a row to the bottom of the dataframe, these will be above stats.
+                    Format is: {row name:[row,contents,as,list]}. (Default is an empty dictionary).
+                    List must be the same dimension as models (to preserve columns)
+
     mgroups:        A dictionary that defines both the groups and what is in it.
-                    For example, mgroups={'Group 1':1,'Group 2':[2,5],'':[6,8]}. 
+                    For example, mgroups={'Group 1':1,'Group 2':[2,5],'':[6,8]}.
                     The keys are the group header (must be strings), and values are a list
-                    (corresponding to the min and max) or integer that defines the regression 
-                    columns of group. You must specify a complete set of groups though 
-                    you can define one as blank (as shown) this will cause that section 
+                    (corresponding to the min and max) or integer that defines the regression
+                    columns of group. You must specify a complete set of groups though
+                    you can define one as blank (as shown) this will cause that section
                     to not have a header or a line underneath it.
 
 Output:
@@ -161,7 +165,7 @@ Output:
         except:
             y = x
         return y
-    # puller function for model parameters
+    # puller functions for model parameters
     def trygetp(x,thing):
         try:
             y = thing[x]
@@ -174,6 +178,31 @@ Output:
         except:
             y = np.nan
         return y
+    def trygetstat(x,model):
+        if x=='nobs':
+            try:
+                y = str(int(model.nobs))
+            except:
+                y = ''
+        elif x=='fvalue':
+            try:
+                y = digform.format(model.fvalue)
+            except:
+                y = ''
+        elif x=='rsquared':
+            try:
+                y = digform.format(model.rsquared)
+            except:
+                y = ''
+        elif x=='rsquared_adj':
+            try:
+                y = digform.format(model.rsquared_adj)
+            except:
+                y = ''
+        else:
+            y = 'Not Programmed'
+        return y
+
     # A function to convert p-values to stars (see outtable custom function)
     def starget(x,stars=stars):
         y = ''
@@ -208,6 +237,9 @@ Output:
 
         if 'const' in paramlist:
             paramlist.append(paramlist.pop(paramlist.index('const')))
+        elif 'Intercept' in paramlist:
+            paramlist.append(paramlist.pop(paramlist.index('Intercept')))
+
     else:
         paramlist = exogvars
 
@@ -226,7 +258,7 @@ Output:
         for m in models:
             cell = trygetcov(p,m.cov_params())
             if not np.isnan(cell):
-                r.append(digform.format(cell))
+                r.append('('+digform.format(cell)+')')
             else:
                 r.append('')
         data.append(r)
@@ -237,24 +269,20 @@ Output:
         rownames.insert(ii,'')
 
     df = pd.DataFrame(data,columns=colnames,index=rownames)
-    
+
+    for key,value in addrows.items():
+        df = df.append(pd.DataFrame([[str(v) for v in value]],index=[key],columns=df.columns))
+
     # Do stuff if there are model statistics to pull
     if modstat:
         options = pd.DataFrame()
         for key,value in modstat.items():
             r = []
             for m in models:
-                if key=='nobs':
-                    cell = str(int(m.nobs))
-                elif key=='fvalue':
-                    cell = digform.format(m.fvalue)
-                elif key=='rsquared':
-                    cell = digform.format(m.rsquared)
-                elif key=='rsquared_adj':
-                    cell = digform.format(m.rsquared_adj)
-                r.append(cell)
+                r.append(trygetstat(key,m))
             options = options.append(pd.DataFrame([r],index=[value]))
     else:
         options = pd.DataFrame()
 
+    # Run the code to update the table
     tex_table(df=df,file=file,addnotes=addnotes,mgroups=mgroups,options=options)

@@ -2,73 +2,81 @@
 A Package To Make Publication Quality Latex Tables From Python Regression Output
 
 Current Issues:
-1. No option to add custom rows to the table (forthcoming).
-2. No option to look for categorical variables (panel or time dummies) and say "Yes" or "No"
-3. This package has been tested with `statsmodels.api.OLS` but not with any other related types of models.
+1. No option to look for categorical variables (panel or time dummies) and say "Yes" or "No"
+2. This package has been tested with `statsmodels.api.OLS` but not with any other related types of models.
+3. Urgent needs: support for other types of statsmodels and linearmodels
 
-The normal use would be as follows:
+The normal use would be as follows (also in `testing_pystout.py`):
 
 ```
+# Testing pystout
 import statsmodels.api as sm
 import pystout
 from pystout import pystout
 
 dta = sm.datasets.webuse('auto')
+dta.loc[:,'const'] = 1
 
-X = sm.add_constant(dta[['mpg','displacement']])
+X = dta[['const','mpg','displacement']]
 
 y = dta.price
 model1 = sm.OLS(y,X).fit()
 
-X = sm.add_constant(dta[['mpg','displacement','turn']])
+X = dta[['const','mpg','displacement','turn']]
 model2 = sm.OLS(y,X).fit()
 
-X = sm.add_constant(dta[['displacement','turn']])
+X = dta[['displacement','const','turn']]
 model3 = sm.OLS(y,X).fit()
 
 
 pystout(models=[model1,model2,model3],
         file='testing/test_table.tex',
-        addnotes=['Here is a little note','another note'],
+        addnotes=['Here is a little note','And another one'],
         digits=2,
         endog_names=['Custom','Header','Please'],
-        varlabels={'const':'Constant','displacement':'Disp','mpg':'MPG'}
+        varlabels={'const':'Constant','displacement':'Disp','mpg':'MPG'},
+        addrows={'Test':['A','Test','Row']},
+        mgroups={'Group 1':1,'Group 2':[2,3]},
+        modstat={'nobs':'Obs','rsquared_adj':'Adj. R\sym{2}'}
         )
 ```
 
 Pystout has the following options:
 
-    models:         You need to provide a list of models to print.
-                    Currenty must be fitted from statsmodels.OLS().fit()
-                    
-    file:           This is the file name (including path) to write to
+  models:         A list of models to print.
+                  Currenty must be fitted from statsmodels.OLS().fit()
 
-    exogvars:       If none, pull all exogenous variable names.
-                    These will be ordered in order of model (the constant will be put last).
-                    If ordered list, then only pull these variables from each model, if exist.
+  file:           This is the file name (including path) to write to.
 
-    endog_names:    False generates numbered columns, True generates columns
-                    based on the exog_names in the models, passing a list makes
-                    custom column names.
+  exogvars:       If none, pull all exogenous variable names.
+                  These will be ordered in order of model (the constant will be put last).
+                  If ordered list, then only pull these variables from each model, if exist.
 
-    varlabels:      Dictionary, or NoneType -- Custom labels for variables in table.
-                    Works for exog/endog variables.
+  endog_names:    False generates numbered columns, True generates columns.
+                  Based on the exog_names in the models, passing a list makes custom column names.
 
-    stars:          Either False/None or a dictionary like: {.1:'+',.05:'*',.01:'**'}.
+  varlabels:      Dictionary, or NoneType -- Custom labels for variables in table.
+                  Works for exog/endog variables.
 
-    digits:         Number of digits to round all items to (default=2).
+  stars:          Either False/None or a dictionary like: {.1:'+',.05:'*',.01:'**'}.
 
-    modstat:        You can add a custom options from sm (F-stat, R-squared, Adjusted R-Squared)
-                    Should be a dictionary of {'Name':'statsmodel statistic'}.
-                    Currently only accepts: fvalue,rsquared,rsquared_adj,nobs
-    
-    addnotes:       Add notes to the bottom of the table
-                    (input is a list; each new element is a new line of comment).
+  digits:         Number of digits to round all items to (default=2).
 
-    mgroups:        A dictionary that defines both the groups and what is in it.
-                    For example, mgroups={'Group 1':1,'Group 2':[2,5],'':[6,8]}. 
-                    The keys are the group header (must be strings), and values are a list
-                    (corresponding to the min and max) or integer that defines the regression 
-                    columns of group. You must specify a complete set of groups though 
-                    you can define one as blank (as shown) this will cause that section 
-                    to not have a header or a line underneath it.
+  modstat:        You can add custom options from sm (F-stat, R-squared, Adjusted R-Squared)
+                  Should be a dictionary of {'Name':'statsmodel statistic'}.
+                  Currently only accepts: fvalue,rsquared,rsquared_adj,nobs
+
+  addnotes:       Add notes to the bottom of the table.
+                  (input is a list; each new element is a new line of comment).
+
+  addrows:        Add a row to the bottom of the dataframe, these will be above stats.
+                  Format is: {row name:[row,contents,as,list]}. (Default is an empty dictionary).
+                  List must be the same dimension as models (to preserve columns)
+
+  mgroups:        A dictionary that defines both the groups and what is in it.
+                  For example, mgroups={'Group 1':1,'Group 2':[2,5],'':[6,8]}.
+                  The keys are the group header (must be strings), and values are a list
+                  (corresponding to the min and max) or integer that defines the regression
+                  columns of group. You must specify a complete set of groups though
+                  you can define one as blank (as shown) this will cause that section
+                  to not have a header or a line underneath it.
