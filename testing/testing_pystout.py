@@ -34,7 +34,7 @@ model5 = ln.IV2SLS(dependent=dta.price,endog=dta.mpg,
 # Print result
 # =============================================================================
 pystout(models=[model1,model2,model3,model4,model5],
-        file='testing/test_table.tex',
+        file='test_table.tex',
         addnotes=['Here is a little note','And another one'],
         digits=2,
         endog_names=['Custom','Header','Please','Thanks','Again'],
