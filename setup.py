@@ -10,7 +10,7 @@ with io.open(os.path.join(dir, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='pystout',
-    version='0.0.1',
+    version='0.0.2',
     description='A Package To Make Publication Quality Latex Tables From Python Regression Output',
     long_description=long_description,
     long_description_content_type='text/markdown',

@@ -12,6 +12,7 @@ Current limitations are that it does not have full support for all relevant mode
 ## Existing Issues
 1. No option to look for categorical variables (panel or time dummies) and say "Yes" or "No"
 2. Currently treats "const" and "Intercept" as two separate variables if you mix and match `sm.OLS()` and `sm.OLS.from_formula()`, for example.
+3. Does not support full list of relevant statistics or `estout` options.
 
 ## How to Use
 The normal use would be as follows (also in `testing_pystout.py`):
@@ -65,6 +66,7 @@ pystout(models=[model1,model2,model3,model4,model5],
 
 ```
 This produces the following table once compiled:
+
 ![Alt text](/testing/test_table.png?raw=true "Python Regression Results")
 
 ## Options
