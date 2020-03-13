@@ -1,12 +1,19 @@
 # Pystout
 A Package To Make Publication Quality Latex Tables From Python Regression Output
 
-This package has been tested with `statsmodels` `OLS` and `linearmodels` `OLS`, `IV2SLS` and `PanelOLS`. Current limitations are that it does not have full support for all relevant model statistics, though this will be added in future releases.
+## Installation
+`pip install pystout`
 
-Current Issues:
+## Background
+This package was built to emulate the features of `estout` or `esttab` in `Stata` although it lacks a lot of their functionality.
+This package has been tested with `statsmodels` `OLS` and `linearmodels` `OLS`, `IV2SLS` and `PanelOLS`.
+Current limitations are that it does not have full support for all relevant model statistics, though this will be added in future releases.
+
+## Existing Issues
 1. No option to look for categorical variables (panel or time dummies) and say "Yes" or "No"
 2. Currently treats "const" and "Intercept" as two separate variables if you mix and match `sm.OLS()` and `sm.OLS.from_formula()`, for example.
 
+## How to Use
 The normal use would be as follows (also in `testing_pystout.py`):
 
 ```
@@ -57,7 +64,7 @@ pystout(models=[model1,model2,model3,model4,model5],
         )
 
 ```
-
+## Options
 Pystout has the following options:
 
     models:         A list of models to print.
