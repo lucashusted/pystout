@@ -64,6 +64,9 @@ pystout(models=[model1,model2,model3,model4,model5],
         )
 
 ```
+This produces the following table once compiled:
+![Alt text](/testing/test_table.png?raw=true "Python Regression Results")
+
 ## Options
 Pystout has the following options:
 
