@@ -73,7 +73,7 @@ This produces the following table once compiled:
 Pystout has the following options:
 
     models:         A list of models to print.
-                    Currenty must be fitted from statsmodels.OLS().fit()
+                    Currently must be fitted from statsmodels.OLS().fit() or linearmodels.
 
     file:           This is the file name (including path) to write to.
 
@@ -109,3 +109,6 @@ Pystout has the following options:
                     columns of group. You must specify a complete set of groups though
                     you can define one as blank (as shown) this will cause that section
                     to not have a header or a line underneath it.
+
+    footnotesize:   Currently accepts 'footnotesize' or 'scriptsize' or 'tiny'.
+                    Automatically compresses vertical space between separate footnotes.

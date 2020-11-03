@@ -4,7 +4,7 @@ import pandas as pd
 ################################################################################
 ### A generic function for writing tables to tex with some customization
 ################################################################################
-def tex_table(df,file,addnotes=[],mgroups={},options=pd.DataFrame()):
+def tex_table(df,file,addnotes=[],mgroups={},options=pd.DataFrame(),footnotesize='footnotesize'):
     '''
 This function writes a table to file. The variable name column will just be the index of the dataframe provided. The column headers will be the column headers. The contents will be the contents of the table.
 
@@ -23,6 +23,12 @@ Options:
     ###########################################################################
     ### Basic Setup
     ###########################################################################
+    spacedict = {'footnotesize':25,'scriptsize':35,'tiny':45}
+    if footnotesize not in spacedict.keys():
+        print('This footnote size not recognized, defaulting to footnotesize')
+        footnotesize = 'footnotesize'
+
+
     # If there are groupings, then we iterate through them
     groupedcols = ''
     groupedlines = ''
@@ -54,11 +60,10 @@ Options:
                         ''])
 
     # Add footnotes (if any)
-    footnotes = []
-    if addnotes:
-        for ii in addnotes:
-            footnotes += ['\multicolumn{%i}{l}{\\footnotesize %s} \\\\' %(df.shape[1]+1,ii)]
-
+    footnotes = ['\multicolumn{%i}{l}{\\%s %s}' %(df.shape[1]+1,footnotesize,ii) for ii in addnotes]
+    if footnotes:
+        footnotes = ('\\vspace{-.%iem} \\\\\n' %spacedict[footnotesize]).join(footnotes)
+        footnotes = [footnotes]
     footer = '\n'.join(['\hline\hline']+footnotes+['\end{tabular}','}'])
 
 
@@ -106,7 +111,8 @@ Options:
 ################################################################################
 def pystout(models, file, exogvars=None, endog_names=False, stars={.1:'+',.05:'*',.01:'**'},
             varlabels=None, digits=2, mgroups={}, addnotes=[], addrows={},
-            modstat={'nobs':'N','fvalue':'F-stat','rsquared_adj':'Adj. R\sym{2}'}
+            modstat={'nobs':'N','fvalue':'F-stat','rsquared_adj':'Adj. R\sym{2}'},
+            footnotesize='footnotesize'
             ):
     '''
 This function needs to read in the relevant statistics to populate the table.
@@ -114,7 +120,7 @@ Then it needs to feed them to some version of tex_table
 
 Inputs:
     models:         A list of models to print.
-                    Currenty must be fitted from statsmodels.OLS().fit()
+                    Currently must be fitted from statsmodels.OLS().fit() or linearmodels.
 
     file:           This is the file name (including path) to write to.
 
@@ -150,6 +156,9 @@ Inputs:
                     columns of group. You must specify a complete set of groups though
                     you can define one as blank (as shown) this will cause that section
                     to not have a header or a line underneath it.
+
+    footnotesize:   Currently accepts 'footnotesize' or 'scriptsize' or 'tiny'.
+                    Automatically compresses vertical space between separate footnotes.
 
 Output:
     file:           The filename you want to write to, including path (should end with '.tex')
@@ -303,4 +312,4 @@ Output:
         options = pd.DataFrame()
 
     # Run the code to update the table
-    tex_table(df=df,file=file,addnotes=addnotes,mgroups=mgroups,options=options)
+    tex_table(df=df,file=file,addnotes=addnotes,mgroups=mgroups,options=options,footnotesize=footnotesize)
