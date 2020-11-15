@@ -5,7 +5,7 @@ import pandas as pd
 ### A generic function for writing tables to tex with some customization
 ################################################################################
 def tex_table(
-    df, file, addnotes=[], mgroups={}, title='', label='', 
+    df, file, addnotes=[], mgroups={}, title='', label='',
     options=pd.DataFrame(),footnotesize='footnotesize'):
     '''
 This function writes a table to file. The variable name column will just be the index of the dataframe provided. The column headers will be the column headers. The contents will be the contents of the table.
@@ -21,7 +21,7 @@ Options:
 
     mgroups: a dictionary that defines both the groups and what is in it. For example, mgroups={'Group 1':1,'Group 2':[2,5],'':[6,8]}. The keys are the group header (must be strings), and values are a list (corresponding to the min and max) or integer that defines the regression columns of group. You must specify a complete set of groups though you can define one as blank (as shown) this will cause that section to not have a header or a line underneath it.
 
-    title: A Latex table caption that will be shown at the top of the table. 
+    title: A Latex table caption that will be shown at the top of the table.
 
     label: A label to be used for refering to table in Latex, e.g. use \\ref{label} to refer to the table
 
@@ -77,7 +77,7 @@ Options:
         footnotes = ('\\vspace{-.%iem} \\\\\n' %spacedict[footnotesize]).join(footnotes)
         footnotes = [footnotes]
     footer = '\n'.join(['\hline\hline']+footnotes+['\end{tabular}','}','\end{table}'])
-    
+
 
 
     ###########################################################################
@@ -159,7 +159,7 @@ Inputs:
 
     digits:         Number of digits to round all items to (default=2).
 
-    scientific_notation: 
+    scientific_notation:
                     If True scientific notation will be used if value is less than 10**(-digits)
 
     modstat:        You can add custom options from sm (F-stat, R-squared, Adjusted R-Squared)
@@ -184,9 +184,9 @@ Inputs:
     footnotesize:   Currently accepts 'footnotesize' or 'scriptsize' or 'tiny'.
                     Automatically compresses vertical space between separate footnotes.
 
-    title: A Latex table caption that will be shown at the top of the table. 
+    title:          A Latex table caption that will be shown at the top of the table.
 
-    label: A label to be used for refering to table in Latex, e.g. use \\ref{label} to refer to the table
+    label:          A label to be used for referring to table in Latex, e.g. use \\ref{label} to refer to the table
 
 
 Output:

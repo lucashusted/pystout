@@ -112,3 +112,11 @@ Pystout has the following options:
 
     footnotesize:   Currently accepts 'footnotesize' or 'scriptsize' or 'tiny'.
                     Automatically compresses vertical space between separate footnotes.
+
+    title:          A Latex table caption that will be shown at the top of the table.
+
+    label:          A label to be used for referring to table in Latex,
+                    e.g. use \\ref{label} to refer to the table
+
+    scientific_notation:
+                    If True scientific notation will be used if value is less than 10**(-digits)
