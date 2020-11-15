@@ -4,7 +4,9 @@ import pandas as pd
 ################################################################################
 ### A generic function for writing tables to tex with some customization
 ################################################################################
-def tex_table(df,file,addnotes=[],mgroups={},options=pd.DataFrame(),footnotesize='footnotesize'):
+def tex_table(
+    df, file, addnotes=[], mgroups={}, title='', label='', 
+    options=pd.DataFrame(),footnotesize='footnotesize'):
     '''
 This function writes a table to file. The variable name column will just be the index of the dataframe provided. The column headers will be the column headers. The contents will be the contents of the table.
 
@@ -18,6 +20,10 @@ Options:
     addnotes: Add notes to the bottom of the table (input is a list; each new element is a new line of comment)
 
     mgroups: a dictionary that defines both the groups and what is in it. For example, mgroups={'Group 1':1,'Group 2':[2,5],'':[6,8]}. The keys are the group header (must be strings), and values are a list (corresponding to the min and max) or integer that defines the regression columns of group. You must specify a complete set of groups though you can define one as blank (as shown) this will cause that section to not have a header or a line underneath it.
+
+    title: A Latex table caption that will be shown at the top of the table. 
+
+    label: A label to be used for refering to table in Latex, e.g. use \\ref{label} to refer to the table
 
     '''
     ###########################################################################
@@ -49,9 +55,11 @@ Options:
         groupedcols += '\\\\'
         groupedlines = groupedlines[:-1]
 
-    # Basic header, with symbolic command stolen from estout (of stata)
-    # We do extra column spacing just in case there is grouping of variables (adds a space)
-    header = '\n'.join(['{',
+
+    header = '\n'.join(['\\begin{table}[H]',
+                        f'\caption{{{title}}}',
+                        f'\label{{{label}}}',
+                        '{',
                         '\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\\fi}',
                         '\\begin{tabular}{@{\extracolsep{2pt}}l*{%i}{c}@{}}' %df.shape[1],
                         '\hline\hline',
@@ -59,12 +67,17 @@ Options:
                         groupedlines,
                         ''])
 
+
+    # Basic header, with symbolic command stolen from estout (of stata)
+    # We do extra column spacing just in case there is grouping of variables (adds a space)
+
     # Add footnotes (if any)
     footnotes = ['\multicolumn{%i}{l}{\\%s %s}' %(df.shape[1]+1,footnotesize,ii) for ii in addnotes]
     if footnotes:
         footnotes = ('\\vspace{-.%iem} \\\\\n' %spacedict[footnotesize]).join(footnotes)
         footnotes = [footnotes]
-    footer = '\n'.join(['\hline\hline']+footnotes+['\end{tabular}','}'])
+    footer = '\n'.join(['\hline\hline']+footnotes+['\end{tabular}','}','\end{table}'])
+    
 
 
     ###########################################################################
@@ -109,9 +122,17 @@ Options:
 ################################################################################
 ### The output functon for statsmodels
 ################################################################################
-def pystout(models, file, exogvars=None, endog_names=False, stars={.1:'+',.05:'*',.01:'**'},
-            varlabels=None, digits=2, mgroups={}, addnotes=[], addrows={},
-            modstat={'nobs':'N','fvalue':'F-stat','rsquared_adj':'Adj. R\sym{2}'},
+def pystout(models, file, exogvars=None, endog_names=False,
+            stars={.1:'+',.05:'*',.01:'**'}, varlabels=None,
+            digits=2, scientific_notation=False, mgroups={},
+            addnotes=[], addrows={}, title='', label='',
+            modstat={
+                'nobs':'N',
+                'fvalue':'F-stat',
+                'rsquared_adj':'Adj. R\sym{2}',
+                'fvalue_robust':'F-stat (robust)',
+                'rsquared_within':'R\sym{2} (Within)'
+            },
             footnotesize='footnotesize'
             ):
     '''
@@ -138,6 +159,9 @@ Inputs:
 
     digits:         Number of digits to round all items to (default=2).
 
+    scientific_notation: 
+                    If True scientific notation will be used if value is less than 10**(-digits)
+
     modstat:        You can add custom options from sm (F-stat, R-squared, Adjusted R-Squared)
                     Should be a dictionary of {'Name':'statsmodel statistic'}.
                     Currently only accepts: fvalue,rsquared,rsquared_adj,nobs
@@ -159,6 +183,11 @@ Inputs:
 
     footnotesize:   Currently accepts 'footnotesize' or 'scriptsize' or 'tiny'.
                     Automatically compresses vertical space between separate footnotes.
+
+    title: A Latex table caption that will be shown at the top of the table. 
+
+    label: A label to be used for refering to table in Latex, e.g. use \\ref{label} to refer to the table
+
 
 Output:
     file:           The filename you want to write to, including path (should end with '.tex')
@@ -207,22 +236,32 @@ Output:
         elif x=='fvalue':
             if m.__module__.startswith('statsmodels'):
                 try:
-                    y = digform.format(model.fvalue)
+                    y = format_digform(model.fvalue)
                 except:
                     y = ''
             elif m.__module__.startswith('linearmodels'):
                 try:
-                    y = digform.format(model.f_statistic.stat)
+                    y = format_digform(model.f_statistic.stat)
                 except:
                     y = ''
         elif x=='rsquared':
             try:
-                y = digform.format(model.rsquared)
+                y = format_digform(model.rsquared)
             except:
                 y = ''
         elif x=='rsquared_adj':
             try:
-                y = digform.format(model.rsquared_adj)
+                y = format_digform(model.rsquared_adj)
+            except:
+                y = ''
+        elif x=='fvalue_robust':
+            try:
+                y = format_digform(model.f_statistic_robust.stat)
+            except:
+                y = ''
+        elif x=='rsquared_within':
+            try:
+                y = format_digform(model.rsquared_within)
             except:
                 y = ''
         else:
@@ -239,8 +278,14 @@ Output:
                     y = r'\sym{%s}' %stars[k]
         return y
 
-    # The format of the numbers in the table
-    digform = "{:.%if}" %digits
+    # A function that returns formatted numbers
+    def format_digform(stat):
+        if (stat < 10**(-digits)) and scientific_notation:
+            digform = "{:.%iE}" %digits
+        else:
+            digform = "{:.%if}" %digits
+        return digform.format(stat)
+
 
     # Define column headers (3 cases)
     cols = len(models)
@@ -276,7 +321,7 @@ Output:
         for m in models:
             cell = trygetp(p,m.params)
             if not np.isnan(cell):
-                r.append(digform.format(cell) + starget(trygetp(p,m.pvalues)))
+                r.append(format_digform(cell) + starget(trygetp(p,m.pvalues)))
             else:
                 r.append('')
         data.append(r)
@@ -284,7 +329,7 @@ Output:
         for m in models:
             cell = trygetcov(p,m)
             if not np.isnan(cell):
-                r.append('('+digform.format(cell)+')')
+                r.append('('+format_digform(cell)+')')
             else:
                 r.append('')
         data.append(r)
@@ -312,4 +357,4 @@ Output:
         options = pd.DataFrame()
 
     # Run the code to update the table
-    tex_table(df=df,file=file,addnotes=addnotes,mgroups=mgroups,options=options,footnotesize=footnotesize)
+    tex_table(df=df,file=file,addnotes=addnotes,mgroups=mgroups,title=title,label=label,options=options,footnotesize=footnotesize)
