@@ -15,6 +15,8 @@ Current limitations are that it does not have full support for all relevant mode
 3. Does not support full list of relevant statistics or `estout` options.
 
 ## How to Use
+If you specify a label and a title, the output is a table object; otherwise, the output is a tabular.
+
 The normal use would be as follows (also in `testing_pystout.py`):
 
 ```
@@ -117,6 +119,8 @@ Pystout has the following options:
 
     label:          A label to be used for referring to table in Latex,
                     e.g. use \\ref{label} to refer to the table
+
+    tableopts:      The options declared for the table as in \begin{table}[tableopts]
 
     scientific_notation:
                     If True scientific notation will be used if value is less than 10**(-digits)
