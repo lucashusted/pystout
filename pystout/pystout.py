@@ -136,7 +136,9 @@ def pystout(models, file, exogvars=None, endog_names=False,
                 'fvalue':'F-stat',
                 'rsquared_adj':'Adj. R\sym{2}',
                 'fvalue_robust':'F-stat (robust)',
-                'rsquared_within':'R\sym{2} (Within)'
+                'rsquared_within':'R\sym{2} (Within)',
+                'aic':'AIC',
+                'bic':'BIC'
             },
             footnotesize='footnotesize'
             ):
@@ -171,7 +173,8 @@ Inputs:
 
     modstat:        You can add custom options from sm (F-stat, R-squared, Adjusted R-Squared)
                     Should be a dictionary of {'Name':'statsmodel statistic'}.
-                    Currently only accepts: fvalue,rsquared,rsquared_adj,nobs
+                    Currently only accepts: fvalue,fvalue_robust,rsquared,rsquared_adj,rsquared_within,
+                    nobs,aic,bic.
 
     addnotes:       Add notes to the bottom of the table.
                     (input is a list; each new element is a new line of comment).
@@ -271,6 +274,16 @@ Output:
         elif x=='rsquared_within':
             try:
                 y = format_digform(model.rsquared_within)
+            except:
+                y = ''
+        elif x=='aic':
+            try:
+                y = format_digform(model.aic)
+            except:
+                y = ''
+        elif x=='bic':
+            try:
+                y = format_digform(model.bic)
             except:
                 y = ''
         else:

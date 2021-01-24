@@ -95,7 +95,8 @@ Pystout has the following options:
 
     modstat:        You can add custom options from sm (F-stat, R-squared, Adjusted R-Squared)
                     Should be a dictionary of {'Name':'statsmodel statistic'}.
-                    Currently only accepts: fvalue,rsquared,rsquared_adj,nobs
+                    Currently only accepts: fvalue, fvalue_robust, rsquared, rsquared_adj,
+                    rsquared_within, nobs, aic, bic.
 
     addnotes:       Add notes to the bottom of the table.
                     (input is a list; each new element is a new line of comment).
