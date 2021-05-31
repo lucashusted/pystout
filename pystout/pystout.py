@@ -293,7 +293,7 @@ Output:
     # A function to convert p-values to stars (see outtable custom function)
     def starget(x,stars=stars):
         y = ''
-        if stars and x:
+        if stars and not np.isnan(x):
             sorted(stars,reverse=True)
             for k in stars.keys():
                 if x<=k:
