@@ -374,7 +374,7 @@ Output:
             r = []
             for m in models:
                 r.append(trygetstat(key,m))
-            options = options.append(pd.DataFrame([r],index=[value]))
+            options = pd.concat([options,pd.DataFrame([r],index=[value])])
     else:
         options = pd.DataFrame()
 
